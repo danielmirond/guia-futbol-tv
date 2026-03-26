@@ -101,7 +101,8 @@ export default function GuiaFutbolMD() {
     setFilter('all')
     setCompFilter('')
     setTeamFilter('')
-    load(new Date().toISOString().split('T')[0])
+    setSelectedDate('')
+    load()
   }
 
   const load = useCallback(async (date?: string) => {

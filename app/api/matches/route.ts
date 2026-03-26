@@ -68,8 +68,8 @@ export async function GET(request: Request) {
     })
 
     // Filtrar por fecha local Madrid
-    const filtered = matches.filter(m => m.localDate === date)
-    filtered.sort((a, b) => String(a.time).localeCompare(String(b.time)))
+    const filtered = date ? matches.filter(m => m.localDate === date) : matches
+    filtered.sort((a, b) => { var d = String(a.localDate).localeCompare(String(b.localDate)); return d !== 0 ? d : String(a.time).localeCompare(String(b.time)); })
 
     return NextResponse.json({
       matches:  filtered,
