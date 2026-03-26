@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   try {
     const res = await fetch(`https://${HOST}/api/Events`, {
       headers: HEADERS,
-      next: { revalidate: 300 },
+      next: { revalidate: date ? 10800 : 0 },
       signal: AbortSignal.timeout(8000),
     })
 
