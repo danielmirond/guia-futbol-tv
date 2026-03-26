@@ -63,7 +63,16 @@ function formatDayHeader(dateStr: string): string {
   return label ? `${label} · ${formatted}` : formatted
 }
 function nowStr() { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}` }
-function isPast(time: string) { return time !== '??:??' && time < nowStr() }
+function isPast(time: string, dateStr?: unknown) {
+  if (!time || time === '??:??') return false
+  const today = new Date().toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-')
+  const matchDate = typeof dateStr === 'string' ? dateStr.slice(0,10) : today
+  const d = new Date(matchDate + 'T12:00:00')
+  const localDate = d.toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-')
+  if (localDate > today) return false
+  if (localDate < today) return true
+  return time < nowStr()
+}
 
 const MD = {
   red: '#CC0000', redLight: '#fde8e8', yellow: '#FFD700',
@@ -371,7 +380,7 @@ export default function GuiaFutbolMD() {
 
             {cmatches.map((m, i) => {
               const n = normalize(m)
-              const past = isPast(n.time)
+              const past = isPast(n.time, m.date)
               return (
                 <div key={i} className={`match-row${past ? ' past' : ''}`}>
 
