@@ -39,6 +39,11 @@ function chColor(name: string) {
   return { bg: '#f3f4f6', text: '#374151', border: '#d1d5db' }
 }
 
+/** YYYY-MM-DD en hora de Madrid, desplazado `days` días. */
+function madridDay(days = 0) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() + days * 86400000))
+}
+
 function pad(n: number) { return String(n).padStart(2, '0') }
 
 function toMadridDate(isoStr: unknown): string {
@@ -99,7 +104,7 @@ export default function GuiaFutbolMD() {
   const [rawMode, setRawMode] = useState(false)
   const [compFilter, setCompFilter] = useState('')
   const [teamFilter, setTeamFilter] = useState('')
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [selectedDate, setSelectedDate] = useState(madridDay())
 
   useEffect(() => {
     const t = setInterval(() => setClock(nowStr()), 30000)
@@ -128,8 +133,8 @@ export default function GuiaFutbolMD() {
 
   useEffect(() => { load() }, [load])
 
-  const today    = new Date().toISOString().split('T')[0]
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
+  const today    = madridDay()
+  const tomorrow = madridDay(1)
   const dateStr  = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   const matches = data?.matches || []
@@ -269,7 +274,7 @@ export default function GuiaFutbolMD() {
       <div style={{ padding: '10px 16px', borderBottom: `1px solid ${MD.border}`, background: MD.lightGray, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(Date.now() + i * 86400000).toISOString().split('T')[0]
+            const d = madridDay(i)
             const label = i === 0 ? 'Hoy' : i === 1 ? 'Mañana' : new Date(d + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' })
             return <button key={d} onClick={() => load(d)} style={tabBtn(selectedDate === d)}>{label}</button>
           })}

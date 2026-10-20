@@ -9,7 +9,8 @@ const HEADERS = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const date = searchParams.get('date') ?? new Date().toISOString().split('T')[0]
+  // "Hoy" en hora de Madrid (el servidor va en UTC: entre 00:00 y 02:00 daba el día anterior)
+  const date = searchParams.get('date') ?? new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(new Date())
 
   try {
     const res = await fetch(`https://${HOST}/api/Events`, {

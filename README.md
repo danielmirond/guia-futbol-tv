@@ -32,7 +32,7 @@ git push -u origin main
 
 | Variable | Valor |
 |---|---|
-| `RAPIDAPI_KEY` | `2b8e2765f1msh63e4b4a4482be36p1dda17jsn28952259927d` |
+| `RAPIDAPI_KEY` | `TU_RAPIDAPI_KEY` |
 | `RAPIDAPI_HOST` | `wosti-futbol-tv-spain.p.rapidapi.com` |
 
 5. Click **Deploy** → en ~1 minuto tienes la URL pública.
@@ -63,7 +63,7 @@ npm run dev
 
 Variables en `.env.local` (ya incluidas en el ZIP):
 ```
-RAPIDAPI_KEY=2b8e2765f1msh63e4b4a4482be36p1dda17jsn28952259927d
+RAPIDAPI_KEY=TU_RAPIDAPI_KEY
 RAPIDAPI_HOST=wosti-futbol-tv-spain.p.rapidapi.com
 ```
 
