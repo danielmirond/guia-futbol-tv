@@ -24,7 +24,12 @@ export async function GET(request: Request) {
 
     const cuerpo = await res.json()
     const raw = cuerpo?.eventos
-    const diag = { status: res.status, campos: Object.keys(cuerpo ?? {}).slice(0, 6), fuente: cuerpo?.fuente ?? null }
+    const diag: Record<string, unknown> = { status: res.status, campos: Object.keys(cuerpo ?? {}).slice(0, 6), fuente: cuerpo?.fuente ?? null }
+    try {
+      const r2 = await fetch(FEED + '&prueba=' + Date.now(), { cache: 'no-store', headers: { 'User-Agent': 'guia-futbol-tv' } })
+      const j2 = await r2.json()
+      diag.conParametroNuevo = { status: r2.status, campos: Object.keys(j2 ?? {}).slice(0, 6), fuente: j2?.fuente ?? null }
+    } catch (e) { diag.conParametroNuevo = String(e) }
     type WostiMatch = Record<string, unknown>
     const rawMatches: WostiMatch[] = Array.isArray(raw) ? raw : []
 
