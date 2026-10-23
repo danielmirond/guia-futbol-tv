@@ -22,7 +22,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: `API returned ${res.status}`, matches: [] }, { status: 502 })
     }
 
-    const raw = (await res.json())?.eventos
+    const cuerpo = await res.json()
+    const raw = cuerpo?.eventos
+    const diag = { status: res.status, campos: Object.keys(cuerpo ?? {}).slice(0, 6), fuente: cuerpo?.fuente ?? null }
     type WostiMatch = Record<string, unknown>
     const rawMatches: WostiMatch[] = Array.isArray(raw) ? raw : []
 
@@ -74,6 +76,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       matches:  filtered,
       count:    filtered.length,
+      diag,
       endpoint: '/api/Events',
       date,
     })
