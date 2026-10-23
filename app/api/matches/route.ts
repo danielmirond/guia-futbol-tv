@@ -1,28 +1,28 @@
 import { NextResponse } from 'next/server'
 
-const KEY  = process.env.RAPIDAPI_KEY!
-const HOST = process.env.RAPIDAPI_HOST!
-const HEADERS = {
-  'x-rapidapi-key':  KEY,
-  'x-rapidapi-host': HOST,
-}
+/**
+ * 23-oct-2026: ya no llama a WOSTI con la clave de RapidAPI. Lee la parrilla de
+ * Guía TV en el mismo formato crudo de WOSTI, que sale de su caché y no gasta
+ * cuota (criterio de Daniel: «hay que coger el respaldo, no la clave»).
+ */
+const FEED = process.env.GUIA_TV_FEED || 'https://www.mundodeportivo.com/guia-tv/api/wosti?formato=crudo'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const date = searchParams.get('date') ?? new Date().toISOString().split('T')[0]
 
   try {
-    const res = await fetch(`https://${HOST}/api/Events`, {
-      headers: HEADERS,
-      next: { revalidate: date ? 10800 : 0 },
-      signal: AbortSignal.timeout(8000),
+    const res = await fetch(FEED, {
+      headers: { 'User-Agent': 'guia-futbol-tv' },
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(10000),
     })
 
     if (!res.ok) {
       return NextResponse.json({ error: `API returned ${res.status}`, matches: [] }, { status: 502 })
     }
 
-    const raw = await res.json()
+    const raw = (await res.json())?.eventos
     type WostiMatch = Record<string, unknown>
     const rawMatches: WostiMatch[] = Array.isArray(raw) ? raw : []
 
