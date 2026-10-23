@@ -5,7 +5,9 @@ import { NextResponse } from 'next/server'
  * Guía TV en el mismo formato crudo de WOSTI, que sale de su caché y no gasta
  * cuota (criterio de Daniel: «hay que coger el respaldo, no la clave»).
  */
-const FEED = process.env.GUIA_TV_FEED || 'https://www.mundodeportivo.com/guia-tv/api/wosti?formato=crudo'
+// «v=2»: dirección nueva para no heredar la copia en caché que se guardó antes de
+// que Guía TV sirviera el formato crudo (23-oct-2026).
+const FEED = process.env.GUIA_TV_FEED || 'https://www.mundodeportivo.com/guia-tv/api/wosti?formato=crudo&v=2'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -22,14 +24,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: `API returned ${res.status}`, matches: [] }, { status: 502 })
     }
 
-    const cuerpo = await res.json()
-    const raw = cuerpo?.eventos
-    const diag: Record<string, unknown> = { status: res.status, campos: Object.keys(cuerpo ?? {}).slice(0, 6), fuente: cuerpo?.fuente ?? null }
-    try {
-      const r2 = await fetch(FEED + '&prueba=' + Date.now(), { cache: 'no-store', headers: { 'User-Agent': 'guia-futbol-tv' } })
-      const j2 = await r2.json()
-      diag.conParametroNuevo = { status: r2.status, campos: Object.keys(j2 ?? {}).slice(0, 6), fuente: j2?.fuente ?? null }
-    } catch (e) { diag.conParametroNuevo = String(e) }
+    const raw = (await res.json())?.eventos
     type WostiMatch = Record<string, unknown>
     const rawMatches: WostiMatch[] = Array.isArray(raw) ? raw : []
 
@@ -81,7 +76,6 @@ export async function GET(request: Request) {
     return NextResponse.json({
       matches:  filtered,
       count:    filtered.length,
-      diag,
       endpoint: '/api/Events',
       date,
     })
